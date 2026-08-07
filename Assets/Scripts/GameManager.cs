@@ -697,7 +697,8 @@ public class GameManager : MonoBehaviour
         {
             var c = FindCity(selectedCityId);
             if (c == null || c.owner == 2) return "";
-            return $"[{c.name}]  체력 {c.hp}/{c.maxHp}  인구 {c.population}  골드 {c.goldPerTurn:0.0}/턴  생산 {c.productionPerTurn:0.0}/턴";
+            string def = CityDefenseMult(c) < 1f ? $"  방어 -{(1f - CityDefenseMult(c)) * 100:0}%" : "";
+            return $"[{c.name}]  체력 {c.hp}/{c.maxHp}  인구 {c.population}  골드 {c.goldPerTurn:0.0}/턴  생산 {c.productionPerTurn:0.0}/턴{def}";
         }
         return "";
     }
@@ -752,10 +753,22 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    // Walls and a hilltop position were previously just a flat max-HP bump with no
+    // effect on damage taken, so they didn't change how a siege actually played out.
+    // A flat damage-reduction multiplier gives them a real defensive identity.
+    float CityDefenseMult(CityData city)
+    {
+        float mult = 1f;
+        if (city.buildings.Contains("walls")) mult *= 0.65f;
+        if (tiles[city.x, city.y] == "hills") mult *= 0.85f;
+        return mult;
+    }
+
     void CaptureOrAttackCity(UnitData attacker, CityData city)
     {
         if (attacker.attack <= 0) { statusText = "이 유닛은 도시를 공격할 수 없습니다."; return; }
-        city.hp -= EffectiveAttack(attacker) + Random.Range(0, 3);
+        int dmg = Mathf.Max(1, Mathf.RoundToInt((EffectiveAttack(attacker) + Random.Range(0, 3)) * CityDefenseMult(city)));
+        city.hp -= dmg;
         attacker.movesLeft -= 1;
         if (city.hp <= 0)
         {
