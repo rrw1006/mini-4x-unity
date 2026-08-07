@@ -56,3 +56,6 @@ crashlytics-build.properties
 # MCP Unity server build output (regenerated on first launch)
 Packages/mcp-unity-main/Server~/node_modules/
 Packages/mcp-unity-main/Server~/build/
+
+# Unity crash/auto-save recovery scenes — not part of the game
+/Assets/_Recovery/
