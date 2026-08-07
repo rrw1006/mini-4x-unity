@@ -1,9 +1,12 @@
 	
 
-	Tiny Battle (1.0)
+	Tiny Battle (1.0) + Map Pack
 
 	Created/distributed by Kenney (www.kenney.nl)
 	Creation date: 08-08-2023
+
+	(terrain_mountain.png is from Kenney's "Map Pack" instead of Tiny Battle —
+	 same author, same CC0 license.)
 
 			------------------------------
 
