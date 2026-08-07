@@ -1277,6 +1277,9 @@ public class GameManager : MonoBehaviour
         GUI.Label(new Rect(16, 32, 900, 22), $"턴 {turnNumber}  |  {(currentPlayer == 0 ? "내 턴" : "AI 턴...")}  |  {techLabel}  |  {civicLabel}  |  {ageLabel}", smallStyle);
         GUI.Label(new Rect(16, 54, 900, 28), statusText, labelStyle);
 
+        if (!gameOver && currentPlayer == 0 && GUI.Button(new Rect(420, 6, 110, 32), "다음 유닛"))
+            CycleToNextUnit();
+
         if (GUI.Button(new Rect(barW - 740, 8, 90, 32), showTechPanel ? "기술 ▲" : "기술 ▼")) { showTechPanel = !showTechPanel; showCivicPanel = false; showGovPanel = false; showGreatPanel = false; }
         if (GUI.Button(new Rect(barW - 640, 8, 90, 32), showCivicPanel ? "시민 ▲" : "시민 ▼")) { showCivicPanel = !showCivicPanel; showTechPanel = false; showGovPanel = false; showGreatPanel = false; }
         if (GUI.Button(new Rect(barW - 540, 8, 110, 32), showGovPanel ? "정부/정책 ▲" : "정부/정책 ▼")) { showGovPanel = !showGovPanel; showTechPanel = false; showCivicPanel = false; showGreatPanel = false; }
@@ -1627,6 +1630,20 @@ public class GameManager : MonoBehaviour
         GUI.DrawTexture(rect, flatTex);
         GUI.color = Color.white;
         DrawOutline(rect, new Color(0.8f, 0.8f, 0.8f));
+    }
+
+    // Cycles through this player's units that still have moves left, so a full turn
+    // can be played via "다음 유닛" without hunting across the map for what's left to move.
+    void CycleToNextUnit()
+    {
+        var candidates = units.Where(u => u.owner == 0 && u.movesLeft > 0).OrderBy(u => u.id).ToList();
+        if (candidates.Count == 0) { statusText = "더 이동할 수 있는 유닛이 없습니다."; return; }
+
+        int idx = candidates.FindIndex(u => u.id == selectedUnitId);
+        var next = candidates[(idx + 1) % candidates.Count];
+        selectedUnitId = next.id;
+        selectedCityId = -1;
+        statusText = $"{TypeName(next.type)} 선택됨. 인접한 타일을 클릭해 이동/공격하세요.";
     }
 
     void OnFoundCity()
