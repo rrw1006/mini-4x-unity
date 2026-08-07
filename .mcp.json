@@ -5,6 +5,9 @@
       "args": [
         "Packages/mcp-unity-main/Server~/build/index.js"
       ]
+    },
+    "render": {
+      "url": "https://mcp.render.com/mcp"
     }
   }
 }

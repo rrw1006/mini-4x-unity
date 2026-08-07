@@ -24,7 +24,8 @@ public class GameManager : MonoBehaviour
     const int GRID_H = 20;
     const float TILE_SIZE = 44f;
     const float BOARD_X = 16f;
-    const float BOARD_Y = 100f;
+    const float BOARD_Y = 126f;
+    const float TOP_BAR_H = 116f;
     const int VISION_RADIUS = 2;
     const int LOYALTY_RADIUS = 5;
     const float RUSH_BUY_GOLD_PER_PRODUCTION = 4f;
@@ -680,6 +681,27 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    // Compact stat readout for the top bar so the player can see what they've
+    // selected without opening a separate panel — especially useful for combat
+    // units where attack/range/moves-left decide whether a move is worth it.
+    string SelectedInfoText()
+    {
+        if (selectedUnitId != -1)
+        {
+            var u = FindUnit(selectedUnitId);
+            if (u == null) return "";
+            string atk = u.attack > 0 ? $"공격 {u.attack}  사거리 {UnitRange(u.type)}  " : "";
+            return $"[{TypeName(u.type)}]  {atk}체력 {u.hp}/{u.maxHp}  이동 {u.movesLeft}/{u.maxMoves}";
+        }
+        if (selectedCityId != -1)
+        {
+            var c = FindCity(selectedCityId);
+            if (c == null || c.owner == 2) return "";
+            return $"[{c.name}]  체력 {c.hp}/{c.maxHp}  인구 {c.population}  골드 {c.goldPerTurn:0.0}/턴  생산 {c.productionPerTurn:0.0}/턴";
+        }
+        return "";
+    }
+
     void TryEstablishTradeRoute(UnitData trader, CityData target)
     {
         var origin = CityAt(trader.x, trader.y);
@@ -1262,7 +1284,7 @@ public class GameManager : MonoBehaviour
 
         // Top bar
         GUI.color = new Color(0.12f, 0.12f, 0.14f);
-        GUI.DrawTexture(new Rect(0, 0, barW, 90), flatTex);
+        GUI.DrawTexture(new Rect(0, 0, barW, TOP_BAR_H), flatTex);
         GUI.color = Color.white;
 
         var pl0 = players[0];
@@ -1276,6 +1298,7 @@ public class GameManager : MonoBehaviour
         string ageLabel = pl0.goldenTurns > 0 ? $"황금기 ({pl0.goldenTurns}턴)" : pl0.darkTurns > 0 ? $"암흑기 ({pl0.darkTurns}턴)" : "평시";
         GUI.Label(new Rect(16, 32, 900, 22), $"턴 {turnNumber}  |  {(currentPlayer == 0 ? "내 턴" : "AI 턴...")}  |  {techLabel}  |  {civicLabel}  |  {ageLabel}", smallStyle);
         GUI.Label(new Rect(16, 54, 900, 28), statusText, labelStyle);
+        GUI.Label(new Rect(16, 84, 1100, 24), SelectedInfoText(), smallStyle);
 
         if (!gameOver && currentPlayer == 0 && GUI.Button(new Rect(420, 6, 110, 32), "다음 유닛"))
             CycleToNextUnit();
