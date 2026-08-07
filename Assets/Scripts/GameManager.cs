@@ -33,6 +33,7 @@ public class GameManager : MonoBehaviour
     static readonly Color FogColor = new Color(0.06f, 0.06f, 0.08f);
     static readonly Color WaterColor = new Color(0.22f, 0.48f, 0.78f);
     static readonly Color HillsTint = new Color(0.78f, 0.68f, 0.45f);
+    static readonly Color MountainTint = new Color(0.6f, 0.62f, 0.66f);
     static readonly Color[] PlayerColors = { new Color(0.25f, 0.55f, 0.95f), new Color(0.88f, 0.22f, 0.22f) };
     static readonly Dictionary<string, Color> DistrictColors = new Dictionary<string, Color>
     {
@@ -1365,7 +1366,7 @@ public class GameManager : MonoBehaviour
                         {
                             var baseTex = terrainTex["plains"];
                             if (baseTex != null) GUI.DrawTexture(rect, baseTex);
-                            GUI.color = shade;
+                            GUI.color = t == "mountain" ? MountainTint * shade : shade;
                         }
                         var tex = terrainTex[t];
                         if (tex != null) GUI.DrawTexture(rect, tex);
